@@ -21,8 +21,16 @@ class TerminusGpsApp:
 
         @self._app.get("/v1/p/{sku}")
         def get_images(sku: str) -> dict:
-            image_paths: list[str] = self.api.product.get_images(sku)
-            return { "sku": sku, "image_paths": image_paths }
+            data = {
+                "name": "Product Name",
+                "feed_product_type": "gps-tracker",
+                "sku": sku,
+                "manufacturer": "TopFlyTech",
+                "external_product_id": "123",
+                "external_product_id_type": "ASIN",
+            }
+            data = self.api.get_product(sku, data)
+            return { "sku": sku, "data": data }
 
         return None
 
@@ -46,3 +54,6 @@ class TerminusGpsApp:
         return self._app
 
 app = TerminusGpsApp().app
+
+if __name__ == "__main__":
+    pass
