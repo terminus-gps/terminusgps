@@ -6,6 +6,13 @@ from terminusgps.db.connection import DatabaseSession
 
 Base = declarative_base()
 
+class Location(Base):
+    __tablename__ = "location"
+
+    # Required
+    id = Column(Integer(), primary_key=True)
+    name = Column(String(30), unique=True, nullable=False)
+
 class Product(Base):
     __tablename__ = "product"
 
@@ -19,6 +26,7 @@ class Product(Base):
     length = Column(Float(), unique=False, nullable=False)
     width = Column(Float(), unique=False, nullable=False)
     height = Column(Float(), unique=False, nullable=False)
+    location_id = Column(Integer(), ForeignKey("location.id"), nullable=False)
 
     # Optional
     product_type = Column(String(30), unique=False, default="GPS Trackers")

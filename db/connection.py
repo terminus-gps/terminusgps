@@ -3,14 +3,15 @@ from sqlalchemy.engine import URL
 from sqlalchemy.orm import sessionmaker
 
 from typing import Self
+from terminusgps.config import TerminusGpsConfig
 
 class DatabaseSession:
     def __init__(self) -> None:
         self.url = URL.create(
             drivername="postgresql",
-            username="postgres",
-            host="localhost",
-            database="test-db",
+            username=TerminusGpsConfig.DB_USER,
+            host=TerminusGpsConfig.DB_HOST,
+            database=TerminusGpsConfig.DB_NAME,
         )
 
         self.engine = create_engine(self.url)
