@@ -15,22 +15,15 @@ class TerminusGpsApp:
         return None
 
     def create_routes(self) -> None:
-        @self._app.get("/v1/")
-        def read_root():
-            return { "Hello": "World" }
-
         @self._app.get("/v1/p/{sku}")
         def get_images(sku: str) -> dict:
-            data = {
-                "name": "Product Name",
-                "feed_product_type": "gps-tracker",
-                "sku": sku,
-                "manufacturer": "TopFlyTech",
-                "external_product_id": "123",
-                "external_product_id_type": "ASIN",
-            }
-            data = self.api.get_product(sku, data)
-            return { "sku": sku, "data": data }
+            product = self.api.get_product(sku)
+            return { "sku": product.sku, "product": product }
+
+        @self._app.post("/v1/p/create")
+        def create_product(data: dict) -> dict:
+            product = self.api.create_product(data)
+            return { "sku": product.sku, "product": product }
 
         return None
 
