@@ -1,11 +1,11 @@
 from pathlib import Path
 from enum import Enum
-from integrations.twilio import TwilioCaller
+from terminusgps.integrations.twilio import TwilioCaller
 
 TERMINUSGPS_IMAGE_DIR = Path(__file__).resolve().parent / "media/product"
 
 class TerminusGps:
-    class TerminusGpsOperatingHours(Enum):
+    class OperatingHours(Enum):
         MONDAY = (6, 18)
         TUESDAY = (6, 18)
         WEDNESDAY = (6, 18)
@@ -14,25 +14,24 @@ class TerminusGps:
         SATURDAY = (0, 24)
         SUNDAY = (0, 24)
 
-    class TerminusGpsStatusCode(Enum):
+    class StatusCode(Enum):
         SUCCESS = 0
         UNKNOWN_USER = 1
         UNKNOWN_PRODUCT = 2
 
-    class TerminusGpsUser:
-        def __init__(self, data: dict) -> None:
-            for key, value in data.items():
-                setattr(self, key, value)
+    class User:
+        def __init__(self) -> None:
 
+            return None
         def create(self, data: dict = None):
             email = data.get("email", None)
 
             if email is not None:
                 self.email = email
-                status_code = self.TerminusGpsStatusCode.SUCCESS.value
+                status_code = self.StatusCode.SUCCESS.value
                 msg = "User created successfully."
             else:
-                status_code = self.TerminusGpsStatusCode.UNKNOWN_USER.value
+                status_code = self.StatusCode.UNKNOWN_USER.value
                 msg = "User not created. No email provided."
                 
             return (
@@ -41,20 +40,19 @@ class TerminusGps:
                 msg,
             )
 
-    class TerminusGpsProduct:
-        def __init__(self, data: dict) -> None:
-            for key, value in data.items():
-                setattr(self, key, value)
+    class Product:
+        def __init__(self) -> None:
 
+            return None
         def create(self, data: dict = None):
             sku = data.get("sku", None)
 
             if sku is not None:
                 self.sku = sku 
-                status_code = self.TerminusGpsStatusCode.SUCCESS.value
+                status_code = self.StatusCode.SUCCESS.value
                 msg = "Product created successfully."
             else:
-                status_code = self.TerminusGpsStatusCode.UNKNOWN_PRODUCT.value
+                status_code = self.StatusCode.UNKNOWN_PRODUCT.value
                 msg = "Product not created. No sku provided."
                 
             return (
@@ -63,8 +61,8 @@ class TerminusGps:
                 msg,
             )
 
-        class TerminusGpsNotificationHandler:
-            class TerminusGpsNotificationTemplate(Enum):
+        class NotificationHandler:
+            class PhoneNotificationTemplate(Enum):
                 IGNITION_ON = "Hello! At {pos_time} your vehicle {unit} switched its ignition on near {location}."
                 IGNITION_OFF = "Hello! At {pos_time} your vehicle {unit} switched its ignition off near {location}."
                 IGNITION_TOGGLE = "Hello! At {pos_time} your vehicle {unit} switched its ignition state near {location}."
@@ -82,7 +80,7 @@ class TerminusGps:
                     base_message += " This occured after hours."
                 return base_message
 
-            class TerminusGpsNotification:
+            class Notification:
                 def __init__(self, handler, data: dict) -> None:
                     self.handler = handler
                     self.phone = data.get("to_number", None)
@@ -93,7 +91,7 @@ class TerminusGps:
                     msg = None
                     after_hours = data.get("after_hours", False)
                     template = getattr(
-                        TerminusGps.TerminusGpsNotificationHandler.TerminusGpsNotificationTemplate,
+                        TerminusGps.NotificationHandler.PhoneNotificationTemplate,
                         self.alert_type.upper(),
                         None
                     )
@@ -103,9 +101,13 @@ class TerminusGps:
 
                     return msg
 
-            def phone(self, notification: TerminusGpsNotification) -> None:
+            def __init__(self) -> None:
+                return None
+
+            def phone(self, notification: Notification) -> None:
                 if notification.phone or notification.message is None:
                     raise ValueError("Data missing for phone notification.")
+
                 caller = TwilioCaller()
                 if isinstance(notification.phone, list):
                     caller.batch_send(notification.phone, notification.message)
@@ -114,11 +116,11 @@ class TerminusGps:
 
 
     def __init__(self) -> None:
-        self.user = self.TerminusGpsUser()
-        self.product = self.TerminusGpsProduct()
-        self.notify = self.TerminusGpsNotificationHandler()
+        self.user = self.User()
+        self.product = self.Product()
+        self.notify = self.NotificationHandler()
 
-    def get_product_images(self, product: TerminusGpsProduct) -> list[str]:
+    def get_product_images(self, product) -> list[str]:
         return [
             f"https://api.terminusgps.com/media/product/{file.name}"
             for file in TERMINUSGPS_IMAGE_DIR.iterdir()
@@ -127,11 +129,11 @@ class TerminusGps:
         ]
 
 
-    def create_product(self, sku: str = None, name: str = None) -> TerminusGpsProduct:
+    def create_product(self, sku: str = None, name: str = None) -> Product:
         if sku is not None:
-            product = self.TerminusGpsProduct({ "sku": sku })
+            product = self.Product({ "sku": sku })
         elif name is not None:
-            product = self.TerminusGpsProduct({ "name": name })
+            product = self.Product({ "name": name })
         else:
             product = None
 
