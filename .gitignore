@@ -2,5 +2,5 @@
 !.gitignore
 
 __pycache__/
-img/
 static/
+media/
