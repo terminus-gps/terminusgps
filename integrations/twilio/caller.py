@@ -1,5 +1,6 @@
 import os
 from twilio.rest import Client
+import asyncio
 
 class TwilioCaller:
     def __init__(self) -> None:
@@ -9,17 +10,32 @@ class TwilioCaller:
 
         return None
 
-    def send(self, to_number: str, msg: str) -> None:
+    async def sms(self, to_number: str, msg: str):
+        print(f"Texting {to_number} with message: {msg}")
+        self.client.messages.create(
+            body=msg,
+            to=to_number,
+            from_="+18447682706",
+        )
+
+    async def call(self, to_number: str, msg: str):
+        print(f"Calling {to_number} with message: {msg}")
         self.client.calls.create(
             twiml=f"<Response><Say>{msg}</Say></Response>",
             to=to_number,
             from_="+18447682706",
         )
 
-        return None
+    async def batch_call(self, to_number: list[str], msg: str):
+        tasks = [
+            asyncio.create_task(self.call(number, msg))
+            for number in to_number
+        ]
+        return tasks
 
-    def batch_send(self, to_number: list[str], msg: str) -> None:
-        for number in to_number:
-            self.send(number, msg)
-
-        return None
+    async def batch_sms(self, to_number: list[str], msg: str):
+        tasks = [
+            asyncio.create_task(self.sms(number, msg))
+            for number in to_number
+        ]
+        return tasks
