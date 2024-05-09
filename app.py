@@ -2,8 +2,8 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
-from api import Notification
-from models import NotificationRequest, NotificationResponse
+from .api import Notification, WialonSession, WialonUser
+from .models import NotificationRequest, NotificationResponse, User
 
 
 
@@ -16,6 +16,14 @@ class TerminusGpsApp:
         return None
 
     def create_routes_v1(self) -> None:
+        @self._app.post("/v1/user/create", response_model=User)
+        def create_user(data: User) -> dict:
+            with WialonSession() as session:
+                user = WialonUser(data)
+                user.create(session)
+
+            return { "user": user.dict() }
+
         @self._app.post("/v1/notify/phone", response_model=NotificationResponse)
         async def notify_phone(data: NotificationRequest) -> dict:
             notification = Notification(data.alert_type, data)
