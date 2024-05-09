@@ -1,5 +1,5 @@
 from enum import Enum
-from .integrations.twilio import TwilioCaller
+from integrations.twilio import TwilioCaller
 
 class Notification:
     class NotificationMessage(Enum):

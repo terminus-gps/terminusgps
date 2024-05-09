@@ -2,8 +2,8 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
-from .api import Notification
-from .models import WialonData
+from api import Notification
+from models import WialonData
 
 
 
