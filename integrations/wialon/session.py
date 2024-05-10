@@ -1,4 +1,5 @@
 from wialon import Wialon
+import os
 
 class WialonSession:
     def __init__(self) -> None:
