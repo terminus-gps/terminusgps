@@ -33,6 +33,7 @@ class Notification:
     def __init__(self, alert_type: str, data: dict) -> None:
         print(f"Creating new notification {alert_type = }")
         self.template = getattr(Notification.NotificationMessage, alert_type.upper(), None)
+        print(f"Selected template {self.template = }")
         self.message = self.create_notification_message(data)
 
         return None
