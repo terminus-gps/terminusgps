@@ -6,12 +6,12 @@ class NotificationRequest(BaseModel):
     unit: str
     pos_time: str
     location: str
-    geo_name: str = "GEO_NAME"
+    geo_name: str | None = None
     after_hours: bool = False
 
 class NotificationResponse(BaseModel):
-    phone: str
-    msg: str
+    phone: str = "+15555555555"
+    msg: str = "Hello! At 04-21-2024 8:31PM your vehicle Chad's Ride had its ignition switched on near 123 Main St. This occured after hours."
 
 class User(BaseModel):
     email: str

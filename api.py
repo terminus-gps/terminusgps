@@ -16,8 +16,8 @@ class Notification:
 
         INVALID_ALERT_TYPE = "Error: alert_type = {alert_type}"
 
-        def format_message(self, template, was_after_hours: bool = False, data: dict = None) -> str:
-            message = template.value.format(
+        def format_message(self, was_after_hours: bool = False, data: dict = None) -> str:
+            message = self.template.value.format(
                 unit=data.unit,
                 pos_time=data.pos_time,
                 location=data.location,
@@ -31,9 +31,7 @@ class Notification:
             return message
 
     def __init__(self, alert_type: str, data: dict) -> None:
-        print(f"Creating new notification {alert_type = }")
         self.template = getattr(Notification.NotificationMessage, alert_type.upper(), None)
-        print(f"Selected template {self.template = }")
         self.message = self.create_notification_message(data)
 
         return None
@@ -59,7 +57,7 @@ class Notification:
     def create_notification_message(self, data: dict) -> str:
         print(f"Creating notification message: {data = }")
         after_hours = data.after_hours
-        return self.NotificationMessage.format_message(self.template, after_hours, data)
+        return self.NotificationMessage.format_message(self, was_after_hours=after_hours, data=data)
 
 
 if __name__ == "__main__":
