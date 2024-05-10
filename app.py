@@ -2,9 +2,8 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
-from api import Notification
-from models import NotificationRequest, NotificationResponse, User
-from integrations.wialon import WialonSession, WialonUser
+from .api import Notification, TerminusUser
+from .models import NotificationRequest, NotificationResponse, TerminusUserRequest, TerminusUserResponse
 
 def clean_phone_number(to_number: str) -> str | list[str]:
     num = to_number
@@ -22,13 +21,12 @@ class TerminusGpsApp:
         return None
 
     def create_routes_v1(self) -> None:
-        @self._app.post("/v1/user/create", response_model=User)
-        def create_user(data: User) -> dict:
-            with WialonSession() as session:
-                user = WialonUser(data)
-                user.create(session)
+        @self._app.post("/v1/user/create", response_model=TerminusUserResponse)
+        def create_user(request: TerminusUserRequest) -> TerminusUserResponse:
+            user = TerminusUser(request)
+            response = user.create_wialon_user()
+            return response
 
-            return { "user": user.dict() }
 
         @self._app.post("/v1/notify/phone", response_model=NotificationResponse)
         async def notify_phone(

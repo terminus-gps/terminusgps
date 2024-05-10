@@ -1,5 +1,39 @@
 from enum import Enum
 from integrations.twilio import TwilioCaller
+from integrations.wialon import WialonSession
+from models import TerminusUserRequest, TerminusUserResponse
+
+from utils import generate_password
+
+class TerminusUser:
+    def __init__(self, request: TerminusUserRequest) -> None:
+        self.request = request
+        return None
+    def make_wialon_params(self, data: dict) -> dict:
+        return {
+            "creator_id": 27881459, # Terminus-1000's User ID
+            "name": data.get("email", None),
+            "password": generate_password(length=12),
+            "data_flags": 0x00000001,
+        }
+
+    def create_wialon_user(self) -> TerminusUserResponse: 
+        params = self.make_wialon_params(self.request.dict())
+
+        with WialonSession() as session:
+            wialon_response = session.wialon_api.core_user_create(**params)
+            print(f"{wialon_response = }")
+            wialon_id = int(wialon_response.get("item").get("id"), None)
+            print(f"{wialon_id = }")
+
+            return TerminusUserResponse(
+                email=self.request.email,
+                wialon={
+                    "user_was_created": True,
+                    "wialon_id": wialon_id,
+                },
+            )
+
 
 class Notification:
     class NotificationMessage(Enum):

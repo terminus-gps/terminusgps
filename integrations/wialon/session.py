@@ -30,8 +30,12 @@ class WialonSession:
 
 class WialonUser:
     def __init__(self, data: dict) -> None:
-        self.data = data
-
+        self.creds = {
+            "creator_id": data.get("creator_id", 27881459),
+            "name": data.get("email", None),
+            "password": data.get("password", generate_password(length=12)),
+            "data_flags": data.get("data_flags", 0x00000001),
+        }
     def create(self, session: WialonSession) -> int:
-        response = session.wialon_api.core_create_user(**self.data)
-        return response.get("item").get("id")
+        response = session.wialon_api.core_create_user(**self.creds)
+        return int(response.get("item").get("id"))
