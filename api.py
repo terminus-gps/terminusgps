@@ -1,9 +1,9 @@
 from enum import Enum
-from integrations.twilio import TwilioCaller
-from integrations.wialon import WialonSession
-from models import TerminusUserRequest, TerminusUserResponse
+from .integrations.twilio import TwilioCaller
+from .integrations.wialon import WialonSession
+from .models import TerminusUserRequest, TerminusUserResponse
 
-from utils import generate_password
+from .utils import generate_password
 
 class TerminusUser:
     def __init__(self, request: TerminusUserRequest) -> None:

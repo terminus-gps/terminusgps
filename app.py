@@ -31,7 +31,7 @@ class TerminusGpsApp:
         @self._app.post("/v1/notify/phone", response_model=NotificationResponse)
         async def notify_phone(
             alert_type: str,
-            to_number: str,
+            to_number,
             unit: str,
             location: str,
             pos_time: str,
@@ -59,7 +59,7 @@ class TerminusGpsApp:
         @self._app.post("/v1/notify/sms", response_model=NotificationResponse)
         async def notify_sms(
             alert_type: str,
-            to_number: str,
+            to_number,
             unit: str,
             location: str,
             pos_time: str,
