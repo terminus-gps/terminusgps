@@ -58,7 +58,7 @@ class Notification:
     def create_notification_message(self, data: dict) -> str:
         print(f"Creating notification message: {data = }")
         after_hours = data.after_hours
-        return self.template.format_message(self.template, after_hours, data)
+        return self.format_message(self.template, after_hours, data)
 
 
 if __name__ == "__main__":
