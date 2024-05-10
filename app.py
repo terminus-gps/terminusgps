@@ -54,7 +54,7 @@ class TerminusGpsApp:
             )
 
             notification = Notification(data.alert_type, data)
-            await notification.call(data.to_number)
+            await notification.call(to_number)
 
             return { "phone": data.to_number, "msg": notification.message }
 
@@ -82,7 +82,7 @@ class TerminusGpsApp:
             )
 
             notification = Notification(data.alert_type, data)
-            await notification.sms(data.to_number)
+            await notification.sms(to_number)
 
             return { "phone": data.to_number, "msg": notification.message }
             
