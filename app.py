@@ -50,6 +50,7 @@ class TerminusGpsApp:
                 location=location,
                 pos_time=pos_time,
                 geo_name=geo_name,
+                after_hours=after_hours,
             )
 
             notification = Notification(data.alert_type, data)
@@ -77,6 +78,7 @@ class TerminusGpsApp:
                 location=location,
                 pos_time=pos_time,
                 geo_name=geo_name,
+                after_hours=after_hours,
             )
 
             notification = Notification(data.alert_type, data)
