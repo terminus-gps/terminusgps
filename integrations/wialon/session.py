@@ -1,5 +1,8 @@
-from wialon import Wialon
 import os
+
+from wialon import Wialon
+from wialon import flags as wialon_flag
+
 
 class WialonSession:
     def __init__(self) -> None:
@@ -28,14 +31,36 @@ class WialonSession:
     def sid(self) -> str:
         return self._sid
 
-class WialonUser:
-    def __init__(self, data: dict) -> None:
-        self.creds = {
-            "creator_id": data.get("creator_id", 27881459),
-            "name": data.get("email", None),
-            "password": data.get("password", generate_password(length=12)),
-            "data_flags": data.get("data_flags", 0x00000001),
+
+class WialonBase:
+    def __init__(self, id: int | None = None) -> None:
+        self._id = id
+        return
+
+    def __str__(self) -> str:
+        return f"Wialon Unit: {self._id}"
+
+    @property
+    def id(self) -> int | None:
+        return self._id
+
+    def get_info(self) -> dict:
+        params = {
+            "id": self.id,
+            "flags": wialon_flag.ITEM_DATAFLAG_BASE,
         }
-    def create(self, session: WialonSession) -> int:
-        response = session.wialon_api.core_create_user(**self.creds)
-        return int(response.get("item").get("id"))
+        with WialonSession() as session:
+            response = session.wialon_api.core_search_item(**params)
+            return response.get("item")
+
+    def rename(self, name: str) -> None:
+        if self.get_info().get("nm") == name:
+            return
+
+        with WialonSession() as session:
+            session.wialon_api.item_update_name(
+                **{
+                    "itemId": self.id,
+                    "name": name,
+                }
+            )

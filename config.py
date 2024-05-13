@@ -1,5 +1,6 @@
 from os import environ as env
 
+
 class TerminusGpsConfig:
     try:
         from dotenv import load_dotenv
@@ -13,3 +14,5 @@ class TerminusGpsConfig:
     DB_PASS = env.get("DB_PASS", None)
     DB_HOST = env.get("DB_HOST", None)
     DB_PORT = env.get("DB_PORT", None)
+
+    WIALON_HOSTING_API_TOKEN = env.get("WIALON_HOSTING_API_TOKEN", None)

@@ -1,9 +1,16 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
+from typing import Annotated
 
-from .api import Notification, TerminusUser
-from .models import NotificationRequest, NotificationResponse, TerminusUserRequest, TerminusUserResponse
+from .integrations.wialon import WialonUser, WialonUnit
+
+from .api import Notification
+from .models import (
+    NotificationRequest,
+    NotificationResponse,
+)
+
 
 def clean_phone_number(to_number: str) -> str | list[str]:
     num = to_number
@@ -21,12 +28,41 @@ class TerminusGpsApp:
         return None
 
     def create_routes_v1(self) -> None:
-        @self._app.post("/v1/user/create", response_model=TerminusUserResponse)
-        def create_user(request: TerminusUserRequest) -> TerminusUserResponse:
-            user = TerminusUser(request)
-            response = user.create_wialon_user()
-            return response
+        @self._app.post("/v1/forms/create_wialon_user")
+        def create_wialon_user(
+            email: Annotated[
+                str,
+                Query(
+                    min_length=4,
+                    max_length=64,
+                    pattern="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$",
+                ),
+            ],
+            imei: Annotated[
+                str,
+                Query(
+                    max_length=24,
+                ),
+            ],
+            asset_name: Annotated[
+                str,
+                Query(
+                    min_length=4,
+                    max_length=64,
+                ),
+            ],
+        ):
 
+            print("Running create_wialon_user")
+            print(f"email: {email}")
+            print(f"imei: {imei}")
+            wialon_unit: WialonUnit = WialonUnit(imei)
+            wialon_user: WialonUser = WialonUser(email)
+
+            wialon_unit.assign_user(wialon_user)
+            wialon_unit.rename(asset_name)
+
+            return {"user": wialon_user, "unit": wialon_unit}
 
         @self._app.post("/v1/notify/phone", response_model=NotificationResponse)
         async def notify_phone(
@@ -37,7 +73,7 @@ class TerminusGpsApp:
             pos_time: str,
             geo_name: str | None = None,
             after_hours: bool = False,
-                               ) -> dict:
+        ) -> dict:
 
             to_number = clean_phone_number(to_number)
 
@@ -54,7 +90,7 @@ class TerminusGpsApp:
             notification = Notification(data.alert_type, data)
             await notification.call(to_number)
 
-            return { "phone": data.to_number, "msg": notification.message }
+            return {"phone": data.to_number, "msg": notification.message}
 
         @self._app.post("/v1/notify/sms", response_model=NotificationResponse)
         async def notify_sms(
@@ -65,7 +101,7 @@ class TerminusGpsApp:
             pos_time: str,
             geo_name: str | None = None,
             after_hours: bool = False,
-                             ) -> dict:
+        ) -> dict:
 
             to_number = clean_phone_number(to_number)
 
@@ -82,26 +118,19 @@ class TerminusGpsApp:
             notification = Notification(data.alert_type, data)
             await notification.sms(to_number)
 
-            return { "phone": data.to_number, "msg": notification.message }
-            
+            return {"phone": data.to_number, "msg": notification.message}
+
     def mount_static_dirs(self, dirs: list) -> None:
-        dirs = [
-            Path(dir).name
-            for dir in dirs
-            if Path(dir).is_dir()
-        ]
+        dirs = [Path(dir).name for dir in dirs if Path(dir).is_dir()]
 
         for dir in dirs:
-            self._app.mount(
-                f"/{dir}",
-                StaticFiles(directory=f"{dir}"),
-                name=f"{dir}"
-            )
+            self._app.mount(f"/{dir}", StaticFiles(directory=f"{dir}"), name=f"{dir}")
 
         return None
 
     @property
     def app(self) -> FastAPI:
         return self._app
+
 
 app = TerminusGpsApp().app

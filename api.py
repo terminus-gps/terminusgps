@@ -1,38 +1,8 @@
 from enum import Enum
 from .integrations.twilio import TwilioCaller
 from .integrations.wialon import WialonSession
-from .models import TerminusUserRequest, TerminusUserResponse
 
 from .utils import generate_password
-
-class TerminusUser:
-    def __init__(self, request: TerminusUserRequest) -> None:
-        self.request = request
-        return None
-    def make_wialon_params(self, data: dict) -> dict:
-        return {
-            "creator_id": 27881459, # Terminus-1000's User ID
-            "name": data.get("email", None),
-            "password": generate_password(length=12),
-            "data_flags": 0x00000001,
-        }
-
-    def create_wialon_user(self) -> TerminusUserResponse: 
-        params = self.make_wialon_params(self.request.dict())
-
-        with WialonSession() as session:
-            wialon_response = session.wialon_api.core_user_create(**params)
-            print(f"{wialon_response = }")
-            wialon_id = int(wialon_response.get("item").get("id"), None)
-            print(f"{wialon_id = }")
-
-            return TerminusUserResponse(
-                email=self.request.email,
-                wialon={
-                    "user_was_created": True,
-                    "wialon_id": wialon_id,
-                },
-            )
 
 
 class Notification:
@@ -50,7 +20,9 @@ class Notification:
 
         INVALID_ALERT_TYPE = "Error: alert_type = {alert_type}"
 
-        def format_message(self, was_after_hours: bool = False, data: dict = None) -> str:
+        def format_message(
+            self, was_after_hours: bool = False, data: dict = None
+        ) -> str:
             message = self.template.value.format(
                 unit=data.unit,
                 pos_time=data.pos_time,
@@ -65,7 +37,9 @@ class Notification:
             return message
 
     def __init__(self, alert_type: str, data: dict) -> None:
-        self.template = getattr(Notification.NotificationMessage, alert_type.upper(), None)
+        self.template = getattr(
+            Notification.NotificationMessage, alert_type.upper(), None
+        )
         self.message = self.create_notification_message(data)
 
         return None
@@ -91,7 +65,9 @@ class Notification:
     def create_notification_message(self, data: dict) -> str:
         print(f"Creating notification message: {data = }")
         after_hours = data.after_hours
-        return self.NotificationMessage.format_message(self, was_after_hours=after_hours, data=data)
+        return self.NotificationMessage.format_message(
+            self, was_after_hours=after_hours, data=data
+        )
 
 
 if __name__ == "__main__":
