@@ -1,10 +1,7 @@
 from enum import Enum
-from .integrations.twilio import TwilioCaller
-from .integrations.wialon import WialonSession
+from integrations.twilio import TwilioCaller
 
-from .models import NotificationRequest
-
-from .utils import generate_password
+from models import NotificationRequest
 
 
 class Notification:
