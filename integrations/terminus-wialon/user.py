@@ -2,7 +2,7 @@ import secrets
 import string
 
 from wialon import flags as wialon_flag
-from .session import WialonSession, WialonBase
+from session import WialonSession, WialonBase
 
 from typing import Union, Optional
 
