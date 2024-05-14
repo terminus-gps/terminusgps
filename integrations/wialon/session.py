@@ -2,6 +2,7 @@ import os
 
 from wialon import Wialon
 from wialon import flags as wialon_flag
+from typing import Union
 
 
 class WialonSession:
@@ -41,14 +42,16 @@ class WialonBase:
         return f"Wialon Unit: {self._id}"
 
     @property
-    def id(self) -> int | None:
+    def id(self) -> Union[int, None]:
         return self._id
 
     def get_info(self) -> dict:
+        print("Running get_info")
         params = {
             "id": self.id,
             "flags": wialon_flag.ITEM_DATAFLAG_BASE,
         }
+        print(f"params: {params}")
         with WialonSession() as session:
             response = session.wialon_api.core_search_item(**params)
             return response.get("item")

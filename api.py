@@ -2,6 +2,8 @@ from enum import Enum
 from .integrations.twilio import TwilioCaller
 from .integrations.wialon import WialonSession
 
+from .models import NotificationRequest
+
 from .utils import generate_password
 
 
@@ -21,7 +23,9 @@ class Notification:
         INVALID_ALERT_TYPE = "Error: alert_type = {alert_type}"
 
         def format_message(
-            self, was_after_hours: bool = False, data: dict = None
+            self,
+            data: NotificationRequest,
+            was_after_hours: bool = False,
         ) -> str:
             message = self.template.value.format(
                 unit=data.unit,
@@ -36,7 +40,7 @@ class Notification:
             print(f"Created message: {message}")
             return message
 
-    def __init__(self, alert_type: str, data: dict) -> None:
+    def __init__(self, alert_type: str, data: NotificationRequest) -> None:
         self.template = getattr(
             Notification.NotificationMessage, alert_type.upper(), None
         )
@@ -62,7 +66,7 @@ class Notification:
         else:
             await twilio.call(to_number, self.message)
 
-    def create_notification_message(self, data: dict) -> str:
+    def create_notification_message(self, data: NotificationRequest) -> str:
         print(f"Creating notification message: {data = }")
         after_hours = data.after_hours
         return self.NotificationMessage.format_message(
