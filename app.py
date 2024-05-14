@@ -3,10 +3,10 @@ from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 from typing import Annotated
 
-from .integrations.wialon import WialonUser, WialonUnit
+from integrations.wialon import WialonUser, WialonUnit
 
-from .api import Notification
-from .models import (
+from api import Notification
+from models import (
     NotificationRequest,
     NotificationResponse,
 )
