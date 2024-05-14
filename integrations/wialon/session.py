@@ -46,15 +46,14 @@ class WialonBase:
         return self._id
 
     def get_info(self) -> dict:
-        print("Running get_info")
         params = {
             "id": self.id,
             "flags": wialon_flag.ITEM_DATAFLAG_BASE,
         }
-        print(f"params: {params}")
         with WialonSession() as session:
             response = session.wialon_api.core_search_item(**params)
-            return response.get("item")
+            info = response.get("item")
+            return info
 
     def rename(self, name: str) -> None:
         if self.get_info().get("nm") == name:

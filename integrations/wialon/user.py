@@ -18,7 +18,6 @@ class WialonUser(WialonBase):
             return self._password
 
         def gen_password(self, length: int = 8) -> str:
-            print("Running WialonUser.WialonPassword.gen_password")
             """
             Create a random Wialon API compliant password.
 
@@ -109,7 +108,6 @@ class WialonUser(WialonBase):
         return self._password
 
     def get_name(self, id: int, session: WialonSession) -> str:
-        print("Running WialonUser.get_name")
         params = {
             "id": id,
             "flags": wialon_flag.ITEM_DATAFLAG_BASE,
@@ -119,7 +117,6 @@ class WialonUser(WialonBase):
         return name
 
     def set_new_userflags(self, session: WialonSession) -> None:
-        print("Running WialonUser.set_default_userflags")
         params = {
             "itemId": self.id,
             "flags": (
@@ -136,15 +133,12 @@ class WialonUser(WialonBase):
         return None
 
     def create(self, session: WialonSession) -> int:
-        print("Running WialonUser.create")
         params = {
             "creatorId": 27881459,  # Terminus 1000's Wialon ID
             "name": self.name,
             "password": self.password,
             "dataFlags": wialon_flag.ITEM_DATAFLAG_BASE,
         }
-        print(f"Create user params: {params}")
         response = session.wialon_api.core_create_user(**params)
-        print(f"Create user {response = }")
         id = response.get("item").get("id")
         return id
