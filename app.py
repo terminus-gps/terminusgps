@@ -1,12 +1,14 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Request
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 from typing import Annotated
 
-from integrations.wialon import WialonUser, WialonUnit
+from .integrations.wialon import WialonUser, WialonUnit
 
-from api import Notification
-from models import (
+from .routes import get_router
+
+from .api import Notification, RegistrationQRCode
+from .models import (
     NotificationRequest,
     NotificationResponse,
 )
@@ -22,8 +24,9 @@ def clean_phone_number(to_number: str) -> str | list[str]:
 class TerminusGpsApp:
     def __init__(self) -> None:
         self._app = FastAPI()
+        self._app.include_router(get_router())
+
         self.mount_static_dirs(["static", "media"])
-        self.create_routes_v1()
 
         return None
 

@@ -1,6 +1,16 @@
 from pydantic import BaseModel
 
 
+class RegistrationFormResponse(BaseModel):
+    status: str = "success"
+    email: str = ""
+
+
+class RegistrationForm(BaseModel):
+    email: str = ""
+    imei: str = ""
+
+
 class WialonRegistrationForm(BaseModel):
     email: str
     first_name: str

@@ -2,5 +2,12 @@
 !.gitignore
 
 __pycache__/
+node_modules/
 static/
 media/
+output/
+
+package-lock.json
+
+credentials.*
+token.*
