@@ -19,7 +19,7 @@ def create_client_routes(router: APIRouter) -> None:
 
     @router.get(
         "/v1/forms/create_qr",
-        tags=["forms", "qr"],
+        tags=["forms"],
     )
     async def create_qr(request: Request):
         imei: str = request.query_params.get("imei", "")
@@ -32,6 +32,7 @@ def create_api_routes(router: APIRouter) -> None:
     @router.post(
         "/v1/notify/phone",
         response_model=NotificationResponse,
+        tags=["notify"],
     )
     async def notify_phone(
         alert_type: str,
@@ -63,7 +64,11 @@ def create_api_routes(router: APIRouter) -> None:
 
         return {"phone": data.to_number, "msg": notification.message}
 
-    @router.post("/v1/notify/sms", response_model=NotificationResponse)
+    @router.post(
+        "/v1/notify/sms",
+        tags=["notify"],
+        response_model=NotificationResponse,
+    )
     async def notify_sms(
         alert_type: str,
         to_number,
@@ -95,8 +100,8 @@ def create_api_routes(router: APIRouter) -> None:
         return {"phone": data.to_number, "msg": notification.message}
 
     @router.post(
-        "/v1/forms/create_wialon_user",
-        tags=["wialon"],
+        "/v1/forms/wialon/create_user",
+        tags=["forms", "wialon"],
     )
     def create_wialon_user(
         email: Annotated[

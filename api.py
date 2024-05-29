@@ -158,15 +158,3 @@ class Notification:
         return self.NotificationMessage.format_message(
             self, was_after_hours=after_hours, data=data
         )
-
-
-if __name__ == "__main__":
-    data = {
-        "alert_type": "ignition_on",
-        "to_number": "+17133049421",
-        "pos_time": "3:00 PM",
-        "unit": "Blake's Ride",
-        "location": "Home",
-    }
-    notification = Notification(data.get("alert_type", None), data)
-    notification.sms(data.get("to_number"))

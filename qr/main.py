@@ -1,4 +1,3 @@
-import sys
 import datetime
 import argparse
 
@@ -6,18 +5,33 @@ from qrcode import QRCode, constants
 from typing import Optional
 from PIL import ImageDraw, ImageFont
 
+from googleapi import get_creds, get_imeis
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Generate QR codes for IMEI registration"
+        description="Generate QR codes for IMEI registration from Google Sheets"
     )
-    parser.add_argument("imei", type=str, help="IMEI number to generate QR code for")
+    parser.add_argument(
+        "spreadsheet_id", type=str, help="Google Spreadsheet ID containing IMEI #s"
+    )
+    parser.add_argument(
+        "range_name", type=str, help="Range containing IMEIs in spreadsheet"
+    )
     args = parser.parse_args()
-    if not args.imei:
-        raise ValueError("IMEI number is required")
-    qr = Registration(args.imei)
-    qr.save()
+    if not args.spreadsheet_id and args.range_name:
+        raise ValueError("Both spreadsheet_id and range_name are required.")
+
+    imeis = get_imeis(args.spreadsheet_id, args.range_name, creds=get_creds())
+    create_qrs(imeis)
+
     return None
+
+
+def create_qrs(imeis: list[str]) -> None:
+    for imei in imeis:
+        qr = Registration(imei)
+        qr.save(name=imei)
 
 
 class QR:
@@ -30,7 +44,11 @@ class QR:
             border=4,
         )
 
-    def generate(self, text: Optional[str], *, save: bool = True) -> None:
+    def generate(
+        self,
+        text: Optional[str],
+        name: Optional[str] = f"{datetime.datetime.now()}.png",
+    ) -> None:
         self.qr.add_data(self.text)
         self.qr.make(fit=True)
 
@@ -39,18 +57,17 @@ class QR:
         if text:
             self._draw_text(text)
 
-        if save:
-            self.save()
+        if name:
+            self.save(name=name)
 
         return None
 
-    def save(self) -> None:
-        self.img.save(f"{datetime.datetime.now()}.png")
+    def save(self, name: str) -> None:
+        self.img.save(f"{name}.png")
 
         return None
 
-    def _draw_text(self, text: str, *, prefix: str = "IMEI #: ") -> None:
-        text = f"{prefix}{text}"
+    def _draw_text(self, text: str) -> None:
         self.img = self.img.convert("RGB")
         self.overlay = ImageDraw.Draw(self.img)
 
@@ -73,7 +90,7 @@ class QR:
 class Registration(QR):
     def __init__(self, imei: str) -> None:
         super().__init__(f"https://register.terminusgps.com?imei={imei}")
-        self.generate(imei, save=False)
+        self.generate(f"IMEI #: {imei}", name=imei)
 
 
 if __name__ == "__main__":
