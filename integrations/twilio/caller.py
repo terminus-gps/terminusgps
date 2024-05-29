@@ -2,10 +2,17 @@ import os
 import asyncio
 from twilio.rest import Client
 
+
 class TwilioCaller:
     def __init__(self) -> None:
-        self._token = os.environ.get("TWILIO_TOKEN")
-        self._sid = os.environ.get("TWILIO_SID")
+        try:
+            token = os.environ.get("TWILIO_TOKEN")
+            sid = os.environ.get("TWILIO_SID")
+        except KeyError:
+            raise ValueError("TWILIO_TOKEN and TWILIO_SID env variables are not set")
+
+        self._token = token
+        self._sid = sid
         self.client = Client(self._sid, self._token)
 
         return None
@@ -27,15 +34,9 @@ class TwilioCaller:
         )
 
     async def batch_call(self, to_number: list[str], msg: str):
-        tasks = [
-            asyncio.create_task(self.call(number, msg))
-            for number in to_number
-        ]
+        tasks = [asyncio.create_task(self.call(number, msg)) for number in to_number]
         return tasks
 
     async def batch_sms(self, to_number: list[str], msg: str):
-        tasks = [
-            asyncio.create_task(self.sms(number, msg))
-            for number in to_number
-        ]
+        tasks = [asyncio.create_task(self.sms(number, msg)) for number in to_number]
         return tasks

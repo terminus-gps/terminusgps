@@ -1,37 +1,19 @@
 from pydantic import BaseModel
-
-
-class RegistrationFormResponse(BaseModel):
-    status: str = "success"
-    email: str = ""
-
-
-class RegistrationForm(BaseModel):
-    email: str = ""
-    imei: str = ""
-
-
-class WialonRegistrationForm(BaseModel):
-    email: str
-    first_name: str
-    last_name: str
-    imei: str
-    phone: str | None = None
-    vin: str | None = None
+from typing import Union
 
 
 class NotificationRequest(BaseModel):
     alert_type: str
-    to_number: str | list[str]
+    to_number: Union[str, list[str]]
     unit: str
     pos_time: str
     location: str
-    geo_name: str | None = None
+    geo_name: Union[str, None] = None
     after_hours: bool = False
 
 
 class NotificationResponse(BaseModel):
     phone: str = "+15555555555"
     msg: str = (
-        "Hello! At 04-21-2024 8:31PM your vehicle Chad's Ride had its ignition switched on near 123 Main St. This occured after hours."
+        "Hello! At 04-21-2024 8:31PM your vehicle Chad's Ride has its ignition switched on near 123 Main St. This occured after hours."
     )

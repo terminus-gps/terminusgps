@@ -34,35 +34,35 @@ class WialonSession:
 
 
 class WialonBase:
-    def __init__(self, id: int | None = None) -> None:
-        self._id = id
-        return
+    def __init__(self) -> None:
+        self._id = None
 
     def __str__(self) -> str:
-        return f"Wialon Unit: {self._id}"
+        return f"Wialon Unit: {self.id}"
 
     @property
-    def id(self) -> Union[int, None]:
+    def id(self) -> str:
         return self._id
 
-    def get_info(self) -> dict:
+    def get_info(self) -> Union[dict, None]:
+        if self.id is None:
+            raise ValueError("Wialon ID is not set")
+
         params = {
             "id": self.id,
             "flags": wialon_flag.ITEM_DATAFLAG_BASE,
         }
         with WialonSession() as session:
             response = session.wialon_api.core_search_item(**params)
-            info = response.get("item")
+            info = response.get("item", None)
             return info
 
-    def rename(self, name: str) -> None:
-        if self.get_info().get("nm") == name:
-            return
-
+    def rename(self, name: str):
         with WialonSession() as session:
-            session.wialon_api.item_update_name(
-                **{
-                    "itemId": self.id,
-                    "name": name,
-                }
-            )
+            params = {
+                "itemId": self.id,
+                "name": name,
+            }
+            session.wialon_api.item_update_name(**params)
+
+        return self

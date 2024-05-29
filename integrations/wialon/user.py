@@ -20,16 +20,7 @@ class WialonUser(WialonBase):
         def gen_password(self, length: int = 8) -> str:
             """
             Create a random Wialon API compliant password.
-
-            Parameters
-            ----------
-            length: <int>
-                The length of the password.
-
-            Returns
-            -------
-            password: <str>
-                The password.
+            ----------------------------------------------
 
             Password Requirements
             ---------------------
@@ -66,57 +57,50 @@ class WialonUser(WialonBase):
                 session.wialon_api.core_reset_password(**{})
 
     def __init__(
-        self, email: Optional[str] = None, id: Union[int, None] = None
+        self,
+        email: str,
+        id: Optional[str] = None,
     ) -> None:
-        if (id is not None and email is not None) or (id is None and email is None):
-            raise ValueError("Either email or id must be provided, but not both.")
-
-        if email:
-            self.init_by_email(email)
-        elif id:
-            self.init_by_id(id)
-
-        return None
-
-    def init_by_id(self, id: int) -> None:
-        with WialonSession() as session:
+        super().__init__()
+        self._name = email
+        if id is not None:
             self._id = id
-            self._name = self.get_name(id, session)
-            self._password = self.WialonPassword(8).raw
-
-        return None
-
-    def init_by_email(self, email: str) -> None:
-        with WialonSession() as session:
-            self._name = email
-            self._password = self.WialonPassword(8).raw
-            self._id = self.create(session)
-            self.set_new_userflags(session)
+        else:
+            self._password = self.WialonPassword(16).raw
+            with WialonSession() as session:
+                self._id = self.create(session)
+                self.set_new_userflags(session)
+            print("Created Wialon user with ID:", self._id)
 
         return None
 
     @property
-    def name(self) -> str:
+    def name(self) -> Union[str, None]:
         return self._name
 
     @property
-    def email(self) -> str:
+    def email(self) -> Union[str, None]:
         return self._name
 
     @property
-    def password(self) -> str:
+    def password(self) -> Union[str, None]:
         return self._password
 
-    def get_name(self, id: int, session: WialonSession) -> str:
+    def get_info(self) -> dict:
+        if self._id is None:
+            raise ValueError("Wialon ID is not set")
+        return super().get_info()
+
+    def get_name(self, session: WialonSession) -> str:
         params = {
-            "id": id,
+            "id": self.id,
             "flags": wialon_flag.ITEM_DATAFLAG_BASE,
         }
         response = session.wialon_api.core_search_item(**params)
         name = response.get("item").get("nm")
         return name
 
-    def set_new_userflags(self, session: WialonSession) -> None:
+    def set_new_userflags(self, session: WialonSession):
         params = {
             "itemId": self.id,
             "flags": (
@@ -130,9 +114,12 @@ class WialonUser(WialonBase):
         }
         session.wialon_api.core_update_user(**params)
 
-        return None
+        return self
 
-    def create(self, session: WialonSession) -> int:
+    def create(self, session: WialonSession) -> str:
+        """
+        Creates a new Wialon user and returns its Wialon ID.
+        """
         params = {
             "creatorId": 27881459,  # Terminus 1000's Wialon ID
             "name": self.name,
@@ -140,5 +127,7 @@ class WialonUser(WialonBase):
             "dataFlags": wialon_flag.ITEM_DATAFLAG_BASE,
         }
         response = session.wialon_api.core_create_user(**params)
-        id = response.get("item").get("id")
+        id = response.get("item", None).get("id", None)
+        if id is None:
+            raise ValueError("Failed to create user.")
         return id

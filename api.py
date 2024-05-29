@@ -1,13 +1,15 @@
 from enum import Enum
 from .integrations.twilio import TwilioCaller
 
-from .models import NotificationRequest
-
-from PIL import Image, ImageDraw, ImageFont
+from PIL import ImageDraw, ImageFont
 from typing import Union
 from pathlib import Path
 from qrcode import QRCode
-from qrcode.constants import ERROR_CORRECT_L
+from qrcode import constants
+
+from .models import (
+    NotificationRequest,
+)
 
 APP_DIR = Path(__file__).resolve().parent
 
@@ -26,8 +28,8 @@ class RegistrationQRCode:
 
     def save(self, dir: Path = Path("./output")) -> None:
         self._generate_qr_code()
-        self._create_output_dir(dir)
-        self.filepath = dir / f"{self.imei}.png"
+        self._create_output_dir(APP_DIR / dir)
+        self.filepath = APP_DIR / dir / f"{self.imei}.png"
         self._apply_overlay()
         self.img.save(self.filepath)
 
@@ -36,7 +38,7 @@ class RegistrationQRCode:
     def _generate_qr_code(self) -> None:
         self.qr = QRCode(
             version=1,
-            error_correction=ERROR_CORRECT_L,
+            error_correction=constants.ERROR_CORRECT_L,
             box_size=10,
             border=4,
         )
@@ -69,9 +71,10 @@ class RegistrationQRCode:
         return None
 
     def _draw_text(self) -> None:
+        text = f"IMEI #: {self.imei}"
         font = ImageFont.truetype("/usr/share/fonts/TTF/OpenSans-Regular.ttf", 28)
 
-        text_bbox = self.overlay.textbbox((0, 0), self.imei, font=font)
+        text_bbox = self.overlay.textbbox((0, 0), text, font=font)
         text_w = text_bbox[2] - text_bbox[0]
         text_h = text_bbox[3] - text_bbox[1]
 
@@ -79,7 +82,7 @@ class RegistrationQRCode:
         x_pos = (img_w - text_w) / 2
         y_pos = img_h - text_h - 10
 
-        self.overlay.text((x_pos, y_pos), self.imei, font=font, fill="black")
+        self.overlay.text((x_pos, y_pos), text, font=font, fill="black")
 
         return None
 

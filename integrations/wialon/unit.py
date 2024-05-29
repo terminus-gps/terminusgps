@@ -1,17 +1,21 @@
+from typing import Union
 from wialon import flags as wialon_flag
-from .session import WialonSession, WialonBase
+
 from .user import WialonUser
+from .session import WialonSession, WialonBase
 
 
 class WialonUnit(WialonBase):
-    def __init__(self, imei: str, vin: str | None = None) -> None:
+    def __init__(self, imei: str, vin: Union[str, None] = None) -> None:
+        super().__init__()
+
         self.imei = imei
         self.vin = vin
-        self._id = self.get_wialon_id(self.imei)
+        self._id = self._get_wialon_id(self.imei)
 
         return None
 
-    def get_wialon_id(self, imei: str) -> int:
+    def _get_wialon_id(self, imei: str) -> str:
         params = {
             "spec": {
                 "itemsType": "avl_unit",
@@ -27,9 +31,9 @@ class WialonUnit(WialonBase):
         with WialonSession() as session:
             response = session.wialon_api.core_search_items(**params)
             id = response.get("items")[0].get("id")
-            return int(id)
+            return id
 
-    def assign_user(self, user: WialonUser) -> None:
+    def assign_user(self, user: WialonUser):
         params = {
             "userId": user.id,
             "itemId": self.id,
@@ -45,3 +49,5 @@ class WialonUnit(WialonBase):
         }
         with WialonSession() as session:
             session.wialon_api.user_update_item_access(**params)
+
+        return self
