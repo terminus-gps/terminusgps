@@ -1,4 +1,6 @@
 import asyncio
+import logging
+import terminus_logger
 from fastapi import APIRouter, Request, Query
 from fastapi.templating import Jinja2Templates
 from typing import Annotated, Union
@@ -7,6 +9,8 @@ from integrations.wialon import WialonUser, WialonUnit
 from models import NotificationRequest, NotificationResponse
 from api import Notification
 from fastapi.responses import JSONResponse
+
+logger = logging.getLogger(__name__)
 
 
 def clean_phone_number(to_number: str) -> Union[list[str], str]:
@@ -25,9 +29,10 @@ def create_dev_routes(router: APIRouter) -> None:
     async def echo(request: Request):
         try:
             body = await request.json()
+            logger.info(f"Received: {body}")
             return JSONResponse(content=body, status_code=200)
         except Exception as e:
-            print(e)
+            logger.error(f"Error: {e}")
             return JSONResponse(content={"error": str(e)}, status_code=400)
 
 
