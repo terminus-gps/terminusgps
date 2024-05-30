@@ -1,13 +1,16 @@
 from fastapi import APIRouter, Request, Query
 from fastapi.templating import Jinja2Templates
-from typing import Annotated
+from typing import Annotated, Union
 
 from .integrations.wialon import WialonUser, WialonUnit
 from .models import NotificationRequest, NotificationResponse
 from .api import Notification
 
 
-def clean_phone_number(to_number: str) -> str | list[str]:
+def clean_phone_number(to_number: str) -> Union[list[str], str]:
+    def clean_prefix(to_number: str) -> str:
+        return self.to_number.replace("+1", "")
+
     num = to_number
     if "," in num:
         num = num.split(",")
@@ -82,6 +85,7 @@ def create_api_routes(router: APIRouter) -> None:
         Text any amount of phone numbers with a custom generated message.
 
         """
+        raise NotImplementedError("SMS currently not supported.")
         to_number = clean_phone_number(to_number)
 
         data = NotificationRequest(
