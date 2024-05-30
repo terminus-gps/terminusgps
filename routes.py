@@ -6,16 +6,28 @@ from typing import Annotated, Union
 from integrations.wialon import WialonUser, WialonUnit
 from models import NotificationRequest, NotificationResponse
 from api import Notification
+from fastapi.responses import JSONResponse
 
 
 def clean_phone_number(to_number: str) -> Union[list[str], str]:
-    def clean_prefix(to_number: str) -> str:
-        return self.to_number.replace("+1", "")
-
     num = to_number
     if "," in num:
         num = num.split(",")
     return num
+
+
+def create_dev_routes(router: APIRouter) -> None:
+    @router.post(
+        "/v1/dev/echo",
+        tags=["dev"],
+    )
+    async def echo(request):
+        try:
+            body = await request.json()
+            return JSONResponse(content=body, status_code=200)
+        except Exception as e:
+            print(e)
+            return JSONResponse(content={"error": str(e)}, status_code=400)
 
 
 def create_client_routes(router: APIRouter) -> None:
