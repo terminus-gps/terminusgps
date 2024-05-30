@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import APIRouter, Request, Query
 from fastapi.templating import Jinja2Templates
 from typing import Annotated, Union
@@ -85,7 +86,6 @@ def create_api_routes(router: APIRouter) -> None:
         Text any amount of phone numbers with a custom generated message.
 
         """
-        raise NotImplementedError("SMS currently not supported.")
         to_number = clean_phone_number(to_number)
 
         data = NotificationRequest(
@@ -99,7 +99,7 @@ def create_api_routes(router: APIRouter) -> None:
         )
 
         notification = Notification(data.alert_type, data)
-        await notification.sms(to_number)
+        await asyncio.sleep(1)  # SMS messaging is currently disabled.
 
         return {"phone": data.to_number, "msg": notification.message}
 
