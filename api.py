@@ -1,5 +1,5 @@
 from enum import Enum
-from .integrations.twilio import TwilioCaller
+from integrations.twilio import TwilioCaller
 
 from PIL import ImageDraw, ImageFont
 from typing import Union
