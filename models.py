@@ -2,6 +2,10 @@ from pydantic import BaseModel
 from typing import Union
 
 
+class EchoRequest(BaseModel):
+    data: dict
+
+
 class NotificationRequest(BaseModel):
     alert_type: str
     to_number: Union[str, list[str]]

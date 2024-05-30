@@ -20,8 +20,9 @@ def create_dev_routes(router: APIRouter) -> None:
     @router.post(
         "/v1/dev/echo",
         tags=["dev"],
+        response_model=dict,
     )
-    async def echo(request):
+    async def echo(request: Request):
         try:
             body = await request.json()
             return JSONResponse(content=body, status_code=200)
