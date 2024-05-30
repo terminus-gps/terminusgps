@@ -21,7 +21,7 @@ class TwilioCaller:
         print(f"Texting {to_number} with message: {msg}")
         self.client.messages.create(
             body=msg,
-            to=to_number,
+            to=f"+1{to_number}",
             from_="+18447682706",
         )
 
@@ -29,7 +29,7 @@ class TwilioCaller:
         print(f"Calling {to_number} with message: {msg}")
         self.client.calls.create(
             twiml=f"<Response><Say>{msg}</Say></Response>",
-            to=to_number,
+            to=f"+1{to_number}",
             from_="+18447682706",
         )
 

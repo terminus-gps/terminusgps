@@ -7,7 +7,7 @@ from pathlib import Path
 from qrcode import QRCode
 from qrcode import constants
 
-from .models import (
+from models import (
     NotificationRequest,
 )
 

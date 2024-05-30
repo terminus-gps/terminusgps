@@ -3,9 +3,9 @@ from fastapi import APIRouter, Request, Query
 from fastapi.templating import Jinja2Templates
 from typing import Annotated, Union
 
-from .integrations.wialon import WialonUser, WialonUnit
-from .models import NotificationRequest, NotificationResponse
-from .api import Notification
+from integrations.wialon import WialonUser, WialonUnit
+from models import NotificationRequest, NotificationResponse
+from api import Notification
 
 
 def clean_phone_number(to_number: str) -> Union[list[str], str]:
@@ -39,28 +39,22 @@ def create_api_routes(router: APIRouter) -> None:
         tags=["notify"],
     )
     async def notify_phone(
-        alert_type: str,
-        to_number,
-        unit: str,
-        location: str,
-        pos_time: str,
-        geo_name: str | None = None,
-        after_hours: bool = False,
+        request: NotificationRequest,
     ) -> dict:
         """
         Call any amount of phone numbers with a custom generated message.
 
         """
-        to_number = clean_phone_number(to_number)
+        to_number = clean_phone_number(request.to_number)
 
         data = NotificationRequest(
-            alert_type=alert_type,
+            alert_type=request.alert_type,
             to_number=to_number,
-            unit=unit,
-            location=location,
-            pos_time=pos_time,
-            geo_name=geo_name,
-            after_hours=after_hours,
+            unit=request.unit,
+            location=request.location,
+            pos_time=request.pos_time,
+            geo_name=request.geo_name,
+            after_hours=request.after_hours,
         )
 
         notification = Notification(data.alert_type, data)
