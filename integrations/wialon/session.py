@@ -1,8 +1,8 @@
 import os
+from typing import Optional, Union
 
 from wialon import Wialon
 from wialon import flags as wialon_flag
-from typing import Union
 
 
 class WialonSession:
@@ -34,8 +34,8 @@ class WialonSession:
 
 
 class WialonBase:
-    def __init__(self) -> None:
-        self._id = None
+    def __init__(self, id: Optional[str]) -> None:
+        self._id = id
 
     def __str__(self) -> str:
         return f"Wialon Unit: {self.id}"

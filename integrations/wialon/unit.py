@@ -1,17 +1,29 @@
-from typing import Union
+from typing import Optional, Union
+
 from wialon import flags as wialon_flag
 
+from .session import WialonBase, WialonSession
 from .user import WialonUser
-from .session import WialonSession, WialonBase
 
 
 class WialonUnit(WialonBase):
-    def __init__(self, imei: str, vin: Union[str, None] = None) -> None:
-        super().__init__()
+    def __init__(
+        self,
+        imei: Union[str, None] = None,
+        id: Union[str, None] = None,
+        vin: Optional[str] = None,
+    ) -> None:
+        if (imei is None and id is None) or (imei is not None and id is not None):
+            raise ValueError("Either id or imei must be provided, but not both.")
 
-        self.imei = imei
-        self.vin = vin
-        self._id = self._get_wialon_id(self.imei)
+        super().__init__(id=id)
+
+        if id and not imei:
+            self._id = id
+        else:
+            self.imei = imei
+            self.vin = vin
+            self._id = self._get_wialon_id(imei)
 
         return None
 

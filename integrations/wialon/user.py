@@ -1,10 +1,10 @@
 import secrets
 import string
+from typing import Optional, Union
 
 from wialon import flags as wialon_flag
-from .session import WialonSession, WialonBase
 
-from typing import Union, Optional
+from .session import WialonBase, WialonSession
 
 
 class WialonUser(WialonBase):
