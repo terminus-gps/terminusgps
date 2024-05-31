@@ -1,7 +1,8 @@
 import urllib.parse
 
-from integrations.wialon import WialonSession
 from wialon import flags as wialon_flag
+
+from integrations.wialon import WialonSession
 
 
 def get_id(
