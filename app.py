@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
-from routes import get_router
+from terminusgps.routes import get_router
 
 
 class TerminusGpsApp:

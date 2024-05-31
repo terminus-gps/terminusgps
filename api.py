@@ -1,15 +1,15 @@
 from enum import Enum
-from integrations.twilio import TwilioCaller
 
-from PIL import ImageDraw, ImageFont
+from PIL import ImageDraw
+from PIL import ImageFont
 from typing import Union
 from pathlib import Path
 from qrcode import QRCode
 from qrcode import constants
 
-from models import (
-    NotificationRequest,
-)
+from terminusgps.integrations.twilio import TwilioCaller
+from terminusgps.models import NotificationRequest
+
 
 APP_DIR = Path(__file__).resolve().parent
 

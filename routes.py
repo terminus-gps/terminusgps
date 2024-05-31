@@ -1,14 +1,18 @@
 import asyncio
 import logging
-import terminus_logger
-from fastapi import APIRouter, Request, Query
-from fastapi.templating import Jinja2Templates
-from typing import Annotated, Union
+import terminusgps.terminus_logger
 
-from integrations.wialon import WialonUser, WialonUnit
-from models import NotificationRequest, NotificationResponse
-from api import Notification
+from fastapi import APIRouter
+from fastapi import Request
+from fastapi import Query
 from fastapi.responses import JSONResponse
+from fastapi.templating import Jinja2Templates
+from terminusgps.integrations.wialon import WialonUser
+from terminusgps.integrations.wialon import WialonUnit
+from terminusgps.models import NotificationRequest, NotificationResponse
+from terminusgps.api import Notification
+from typing import Annotated
+from typing import Union
 
 logger = logging.getLogger(__name__)
 
