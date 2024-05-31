@@ -6,7 +6,7 @@ from fastapi import APIRouter, Query, Request
 from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
 
-import terminusgps.terminus_logger
+import terminusgps.terminusgps_logger
 from terminusgps.api import Notification
 from terminusgps.integrations.wialon import WialonUnit, WialonUser
 from terminusgps.models import NotificationRequest, NotificationResponse
@@ -154,8 +154,10 @@ def create_api_routes(router: APIRouter) -> None:
         return {"unit": unit.id, "user": user.id}
 
 
-def get_router() -> APIRouter:
+def get_router(debug_enabled: bool = False) -> APIRouter:
     router = APIRouter()
     create_client_routes(router)
     create_api_routes(router)
+    if debug_enabled:
+        create_dev_routes(router)
     return router

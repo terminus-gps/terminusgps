@@ -9,7 +9,7 @@ from terminusgps.routes import get_router
 class TerminusGpsApp:
     def __init__(self) -> None:
         self._app = FastAPI()
-        self._app.include_router(get_router())
+        self._app.include_router(get_router(debug_enabled=True))
         self.mount_static_dirs(["static", "media"])
 
         return None

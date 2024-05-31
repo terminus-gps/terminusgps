@@ -1,6 +1,12 @@
-import os
 import asyncio
+import logging
+import os
+
 from twilio.rest import Client
+
+import terminusgps.terminusgps_logger
+
+logger = logging.getLogger(__name__)
 
 
 class TwilioCaller:
@@ -18,7 +24,7 @@ class TwilioCaller:
         return None
 
     async def sms(self, to_number: str, msg: str):
-        print(f"Texting {to_number} with message: {msg}")
+        logger.info(f"Sending '{msg}' to '{to_number}' via SMS")
         self.client.messages.create(
             body=msg,
             to=to_number,
@@ -26,7 +32,7 @@ class TwilioCaller:
         )
 
     async def call(self, to_number: str, msg: str):
-        print(f"Calling {to_number} with message: {msg}")
+        logger.info(f"Sending '{msg}' to '{to_number}' via Voice")
         self.client.calls.create(
             twiml=f"<Response><Say>{msg}</Say></Response>",
             to=to_number,

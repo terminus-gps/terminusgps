@@ -1,3 +1,4 @@
+import logging
 from enum import Enum
 from pathlib import Path
 from typing import Union
@@ -5,10 +6,12 @@ from typing import Union
 from PIL import ImageDraw, ImageFont
 from qrcode import QRCode, constants
 
+import terminusgps.terminusgps_logger
 from terminusgps.integrations.twilio import TwilioCaller
 from terminusgps.models import NotificationRequest
 
 APP_DIR = Path(__file__).resolve().parent
+logger = logging.getLogger(__name__)
 
 
 class RegistrationQRCode:
@@ -120,7 +123,7 @@ class Notification:
             if was_after_hours:
                 message += " This occured after hours."
 
-            print(f"Created message: {message}")
+            logger.info(f"Created message: {message}")
             return message
 
     def __init__(self, alert_type: str, data: NotificationRequest) -> None:
@@ -132,7 +135,6 @@ class Notification:
         return None
 
     async def sms(self, to_number: str | list[str]) -> None:
-        print(f"Sending '{self.message}' to '{to_number}' via SMS")
         twilio = TwilioCaller()
 
         if isinstance(to_number, list):
@@ -141,7 +143,6 @@ class Notification:
             await twilio.sms(to_number, self.message)
 
     async def call(self, to_number: str | list[str]) -> None:
-        print(f"Sending '{self.message}' to '{to_number}' via phone call")
         twilio = TwilioCaller()
 
         if isinstance(to_number, list):
@@ -150,7 +151,7 @@ class Notification:
             await twilio.call(to_number, self.message)
 
     def create_notification_message(self, data: NotificationRequest) -> str:
-        print(f"Creating notification message: {data = }")
+        logging.info(f"Creating message for alert_type: {data.alert_type}")
         after_hours = data.after_hours
         return self.NotificationMessage.format_message(
             self, was_after_hours=after_hours, data=data
