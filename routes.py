@@ -2,11 +2,10 @@ import asyncio
 import logging
 from typing import Annotated, Union
 
+import terminusgps.terminusgps_logger
 from fastapi import APIRouter, Query, Request
 from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
-
-import terminusgps.terminusgps_logger
 from terminusgps.api import Notification
 from terminusgps.integrations.wialon import WialonUnit, WialonUser
 from terminusgps.models import NotificationRequest, NotificationResponse
@@ -23,7 +22,7 @@ def clean_phone_number(to_number: str) -> Union[list[str], str]:
 
 def create_dev_routes(router: APIRouter) -> None:
     @router.post(
-        "/v1/dev/echo",
+        "/dev/echo",
         tags=["dev"],
         response_model=dict,
     )
@@ -41,7 +40,7 @@ def create_client_routes(router: APIRouter) -> None:
     template = Jinja2Templates("templates")
 
     @router.get(
-        "/v1/forms/create_qr",
+        "/forms/create_qr",
         tags=["forms"],
     )
     async def create_qr(request: Request):
@@ -53,7 +52,7 @@ def create_client_routes(router: APIRouter) -> None:
 
 def create_api_routes(router: APIRouter) -> None:
     @router.post(
-        "/v1/notify/phone",
+        "/notify/phone",
         response_model=NotificationResponse,
         tags=["notify"],
     )
@@ -82,7 +81,7 @@ def create_api_routes(router: APIRouter) -> None:
         return {"phone": data.to_number, "msg": notification.message}
 
     @router.post(
-        "/v1/notify/sms",
+        "/notify/sms",
         tags=["notify"],
         response_model=NotificationResponse,
     )
@@ -117,7 +116,7 @@ def create_api_routes(router: APIRouter) -> None:
         return {"phone": data.to_number, "msg": notification.message}
 
     @router.post(
-        "/v1/forms/wialon/create_user",
+        "/forms/wialon/create_user",
         tags=["forms", "wialon"],
     )
     def create_wialon_user(
